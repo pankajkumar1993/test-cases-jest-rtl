@@ -774,3 +774,257 @@ we can test multiple element when the attribute of elements are same
 
 import { render, screen, configure } from "@testing-library/react";
 configure({ testIdAttribute: 'element-id' });
+
+
+# getByAltText
+
+used to test images by getting alt text
+
+
+# Priority Order for RTL Queries
+we have to use most of the time : ByRole
+
+if you donot have role then follow the order.
+
+ByRole > ByLabelText > ByPlaceholderText > ByText > ByDisplayValue > ByAltText > ByTitle > ByTestId
+
+if element donot have the any then use ByTestId 
+
+In React Testing Library (RTL), queries are prioritized based on how closely they reflect how a user would interact with the UI. The queries are divided into different levels of priority, with the higher-priority ones being preferred for more user-centric testing. Here's the recommended priority order for RTL queries:
+
+1. Queries Accessible to Everyone (Best Choice)
+These queries are user-facing and focus on accessibility, which is why they are considered the most reliable and should be used whenever possible.
+
+getByRole: Queries elements by their ARIA role. This is the most user-centric way to query elements, as roles are often how users navigate interfaces.
+
+const button = screen.getByRole('button', { name: /submit/i });
+getByLabelText: Queries form controls (like <input> or <textarea>) associated with labels.
+
+const input = screen.getByLabelText(/username/i);
+getByPlaceholderText: Queries input fields by their placeholder attribute.
+
+const input = screen.getByPlaceholderText(/enter your username/i);
+getByText: Queries elements by the visible text they contain.
+
+const element = screen.getByText(/welcome/i);
+getByDisplayValue: Queries form elements by their current value.
+
+const input = screen.getByDisplayValue('John Doe');
+2. Queries Based on Semantics
+These queries rely on semantic content that may not be immediately visible to the user but is important for accessibility.
+
+getByAltText: Queries elements by the text used in alt attributes (e.g., for images).
+
+const image = screen.getByAltText(/profile picture/i);
+getByTitle: Queries elements by their title attribute.
+
+const element = screen.getByTitle('close button');
+3. Test IDs (Less Preferred)
+Using test-specific identifiers should be avoided unless there’s no better option for accessing elements. These are not how users interact with interfaces but are useful for uniquely identifying components in certain cases.
+
+getByTestId: Queries elements by the data-testid attribute.
+
+const element = screen.getByTestId('custom-element');
+Priority Usage Guidelines
+Always start with queries based on roles or labels (getByRole, getByLabelText, getByText), as these closely reflect how users and assistive technologies interact with the UI.
+Avoid getByTestId unless absolutely necessary, since it's not representative of how users interact with your interface.
+Fallback queries (getByAltText, getByPlaceholderText, getByTitle) are useful when user-accessible queries are not feasible.
+By following this order of priority, your tests will remain focused on the user experience and accessibility, ensuring the robustness and maintainability of your test cases.
+
+
+# Assertion Methods
+
+In testing, assertion methods are used to verify that the expected output or behavior of the code matches the actual result during tests. When using testing libraries like Jest (often combined with React Testing Library), these assertion methods help check whether certain conditions are met within your tests.
+
+Here are common assertion methods used in Jest, React Testing Library (RTL), and general testing:
+
+1. Jest Assertion Methods
+Jest provides a wide variety of built-in assertion methods to verify the correctness of the code.
+
+Basic Assertions:
+toBe: Checks for primitive equality (e.g., numbers, strings, booleans).
+
+expect(2 + 2).toBe(4);
+toEqual: Checks for deep equality (used for objects or arrays).
+
+expect({ name: 'John' }).toEqual({ name: 'John' });
+Boolean Assertions:
+toBeTruthy: Asserts that a value is truthy (i.e., it evaluates to true).
+
+expect(value).toBeTruthy();
+toBeFalsy: Asserts that a value is falsy (i.e., it evaluates to false).
+
+expect(value).toBeFalsy();
+Comparison Assertions:
+toBeGreaterThan: Checks if a value is greater than a certain number.
+
+expect(10).toBeGreaterThan(5);
+toBeLessThan: Checks if a value is less than a certain number.
+
+expect(3).toBeLessThan(5);
+String Assertions:
+toMatch: Checks if a string matches a regular expression.
+
+expect('Hello World').toMatch(/world/i); // case-insensitive match
+Array and Object Assertions:
+toContain: Checks if an array contains a specific value.
+
+expect([1, 2, 3]).toContain(2);
+toHaveProperty: Asserts that an object contains a specific property.
+
+expect({ name: 'John', age: 30 }).toHaveProperty('age', 30);
+Function Assertions:
+toHaveBeenCalled: Checks if a mock function has been called.
+
+const mockFunction = jest.fn();
+mockFunction();
+expect(mockFunction).toHaveBeenCalled();
+toHaveBeenCalledWith: Checks if a mock function has been called with specific arguments.
+
+const mockFunction = jest.fn();
+mockFunction('argument');
+expect(mockFunction).toHaveBeenCalledWith('argument');
+2. React Testing Library Assertion Methods
+React Testing Library extends Jest with more user-centric assertions, which are included by using the @testing-library/jest-dom library.
+
+Common RTL Assertions:
+toBeInTheDocument: Asserts that an element exists in the document.
+
+expect(screen.getByText(/submit/i)).toBeInTheDocument();
+toBeVisible: Asserts that an element is visible.
+
+expect(screen.getByText(/submit/i)).toBeVisible();
+toHaveTextContent: Checks if an element contains a specific text.
+
+expect(screen.getByTestId('header')).toHaveTextContent('Hello');
+toHaveClass: Asserts that an element has a specific CSS class.
+
+expect(screen.getByTestId('my-element')).toHaveClass('active');
+toBeDisabled: Asserts that a form control is disabled.
+
+expect(screen.getByRole('button')).toBeDisabled();
+toHaveAttribute: Checks if an element has a specific attribute with a value.
+
+expect(screen.getByLabelText('Password')).toHaveAttribute('type', 'password');
+3. Combining Assertions
+You can also combine multiple assertions to check more complex behaviors:
+
+
+const button = screen.getByRole('button', { name: /submit/i });
+expect(button).toBeInTheDocument();
+expect(button).toBeVisible();
+expect(button).toBeEnabled();
+Summary
+Basic Assertions: toBe, toEqual, toBeTruthy, etc., are used for verifying basic values like strings, numbers, or booleans.
+RTL Assertions: toBeInTheDocument, toHaveTextContent, and toHaveClass help verify that elements behave as expected in the DOM.
+Mock Function Assertions: toHaveBeenCalled and toHaveBeenCalledWith are useful for testing interactions like button clicks and API calls.
+These assertion methods will help you verify different aspects of your React components and applications when writing tests.
+
+
+Jest has a variety of assertion methods for testing, including: 
+Equality assertions: Jest has assertions for equality. 
+Number assertions: Jest has assertions for numbers. 
+Array assertions: Jest has assertions for arrays. 
+Object assertions: Jest has assertions for objects. 
+Convenience methods: Jest has convenience methods for testing common values like undefined. 
+Matcher assertions: Jest uses matchers to test values in different ways. 
+expect.assertions: This method verifies that a certain number of assertions are called during a test. This is useful when testing asynchronous code. 
+toHaveProperty: This method checks if a property exists for an object at a provided reference keyPath. 
+toHaveReturnedTimes: This method ensures that a mock function returned successfully an exact number of times. 
+
+What is assertion in Jest testing?
+An assertion is a check that values meet certain conditions. In other words, if you use expect. assertions(5) the test will fail unless expect() is called at least 5 times. This is useful for async tests, but it's not the only way to handle asynchronicity, you can find other patterns in the Jest doc.
+
+# text match;
+with strings,
+with regex
+with functions
+
+
+In Jest and React Testing Library (RTL), you can use text matching to verify if certain content exists in your components. Text matching can be done using strings, regular expressions (regex), or custom functions depending on the level of flexibility you need.
+
+Here’s how to work with text matching using these three approaches:
+
+1. Text Matching with Strings
+Using strings for matching is the simplest and strictest method. It matches text exactly as it appears (case-sensitive by default).
+
+javascript
+Copy code
+expect(screen.getByText('Submit')).toBeInTheDocument();
+Exact match (case-sensitive):
+
+The string must exactly match the content in the DOM.
+javascript
+Copy code
+expect(screen.getByText('Submit')).toBeInTheDocument();
+Case-insensitive matching (using the i flag with regex):
+
+If you want to make it case-insensitive, use regular expressions (discussed next).
+2. Text Matching with Regular Expressions (Regex)
+Regular expressions provide more flexibility for matching text, including partial, case-insensitive, or pattern-based matches.
+
+Case-insensitive match:
+
+javascript
+Copy code
+expect(screen.getByText(/submit/i)).toBeInTheDocument();  // 'i' flag makes it case-insensitive
+Partial match:
+
+javascript
+Copy code
+expect(screen.getByText(/sub/)).toBeInTheDocument();  // Matches any element containing 'sub'
+Exact match with regex:
+
+This can be helpful if you're looking for a very specific pattern or structure.
+javascript
+Copy code
+expect(screen.getByText(/^Submit$/)).toBeInTheDocument();  // Matches exactly 'Submit'
+Matching with special characters or numbers:
+
+javascript
+Copy code
+expect(screen.getByText(/\d+ items/)).toBeInTheDocument();  // Matches text like '5 items', '10 items', etc.
+3. Text Matching with Functions
+You can also pass a custom function to match elements based on more complex conditions. The function receives the text content of the element as an argument, and it should return true if a match is found.
+
+Custom function for matching:
+
+javascript
+Copy code
+expect(screen.getByText((content) => content.startsWith('Sub'))).toBeInTheDocument();
+Matching elements containing dynamic content:
+
+You can also create custom matching logic, like checking if the content contains part of a dynamic string.
+javascript
+Copy code
+const dynamicText = 'Submit your response';
+expect(screen.getByText((content) => content.includes('Submit'))).toBeInTheDocument();
+More advanced logic (e.g., ignoring certain characters or whitespace):
+
+javascript
+Copy code
+expect(screen.getByText((content) => content.trim() === 'Submit')).toBeInTheDocument();
+Use Cases for Each Type of Matching
+Strings: Best for exact, simple text matches where the content doesn't change or is static.
+Regex: Ideal for partial matches, case-insensitive searches, or if you need to match text patterns.
+Functions: Useful when more complex logic is needed (e.g., when ignoring whitespace, trimming content, or checking dynamic values).
+Example
+Here's a practical example combining all three matching approaches:
+
+javascript
+Copy code
+// String match (case-sensitive)
+expect(screen.getByText('Hello')).toBeInTheDocument();
+
+// Regex match (case-insensitive)
+expect(screen.getByText(/hello/i)).toBeInTheDocument();
+
+// Custom function match
+expect(screen.getByText((content) => content.startsWith('Hello'))).toBeInTheDocument();
+By using strings, regex, or functions, you can tailor text matching in your tests to match the exact behavior you're trying to verify.
+
+
+
+
+
+

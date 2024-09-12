@@ -1,8 +1,8 @@
 import logo from './logo.svg';
 import './App.css';
-import OnChangeEvents from './OnChangeEvents/OnChangeEvents';
-import OnClickEvent from './OnClickEvent/OnClickEvent';
-import UserClassComponent from './ClassComponent/ClassComponent';
+import UserEventClick from './Events/2-UserEvent/OnClick/UserEventClick';
+import TestProps from './TestProps/SimpleTestProps/SimpleTestProps';
+import UsersLists from './MockServiceWorker/CallAPi/UsersLists';
 
 function App() {
   return (
@@ -21,9 +21,9 @@ function App() {
           Learn React with jest
         </a>
         <p>testing react app</p>
-        <OnChangeEvents />
-        <OnClickEvent />
-        <UserClassComponent />
+        <UserEventClick />
+        <TestProps />
+        <UsersLists />
       </header>
     </div>
   );
