@@ -499,9 +499,278 @@ You can also combine it with snapshot testing to verify the rendered output of t
 Would you like to test other advanced features of a class component, such as lifecycle methods or asynchronous operations?
 
 
-
-
-
-
 npm install --save-dev react-test-renderer
 this package provides us all instances of the component
+
+
+# Functional Component method testing
+test only those methods which are shown on ui , no need to test.
+- by firing event like click on change
+- we can not change the method without event which is not present in the ui, to test this
+1. we have to takes out the method from component then test it
+2. or we can make it class component
+
+
+In fuxntional componet it is difficult to test a method, we cannot extract the method from fucnctional compoenent which is mot shown in the ui, but you can test this method in class component using rendered method
+
+Testing methods and functionality within functional components in React involves testing how the component behaves when interacting with user events, state changes, effects, and other hooks. Here’s how you can test functional components, particularly focusing on testing hooks like useState, useEffect, useCallback, and methods used in the component.
+
+Steps to Test Functional Components:
+Render the Component: Use render from React Testing Library (RTL) to mount the component.
+Simulate User Interaction: Use fireEvent or userEvent to simulate clicks, typing, and other actions.
+Test State Updates: After interacting with the component, check if the state updates correctly.
+Test useEffect and Side Effects: Mock side effects and test component behavior after effects are triggered.
+Mock External Functions: If your component uses API calls or functions passed as props, mock those for isolated testing.
+Example Testing Hooks (useState, useEffect)
+Functional Component
+Here’s a simple functional component using useState and useEffect:
+
+tsx
+Copy code
+import React, { useState, useEffect } from 'react';
+
+const Counter = () => {
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(false); // Simulates loading state
+  }, []);
+
+  const increment = () => setCount(count + 1);
+
+  return (
+    <div>
+      {loading ? <p>Loading...</p> : <p>Count: {count}</p>}
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+};
+
+export default Counter;
+Testing useState and useEffect
+Here’s how to write a test for the Counter component using Jest and RTL.
+
+tsx
+Copy code
+import { render, screen, fireEvent } from '@testing-library/react';
+import Counter from './Counter';
+
+test('renders loading, then displays count and allows increment', () => {
+  // Render the component
+  render(<Counter />);
+  
+  // Initially, loading message should be present
+  expect(screen.getByText(/loading/i)).toBeInTheDocument();
+
+  // After `useEffect`, count should be displayed
+  expect(screen.queryByText(/count: 0/i)).not.toBeInTheDocument();
+  
+  // Mock the behavior of useEffect using async for the state change
+  setTimeout(() => {
+    expect(screen.getByText(/count: 0/i)).toBeInTheDocument();
+  }, 0);
+
+  // Find and click the increment button
+  const button = screen.getByRole('button', { name: /increment/i });
+  fireEvent.click(button);
+
+  // After clicking, the count should increment
+  expect(screen.getByText(/count: 1/i)).toBeInTheDocument();
+});
+Breakdown of Testing Approach:
+Initial State: Test the component's loading state by checking if "Loading..." is displayed.
+State Changes: Wait for the useEffect to complete and check if the correct count is rendered.
+Event Simulation: Simulate a button click using fireEvent or userEvent.
+Assertions: Verify that the UI has updated accordingly after the state change.
+Testing with useEffect (Mocking API calls)
+If your component makes API calls inside useEffect, you can mock them.
+
+tsx
+Copy code
+import { render, screen, waitFor } from '@testing-library/react';
+import axios from 'axios';
+import Users from './Users';
+jest.mock('axios');
+
+test('fetches and displays users', async () => {
+  const users = [{ id: 1, name: 'John Doe' }];
+  axios.get.mockResolvedValueOnce({ data: users });
+
+  render(<Users />);
+  
+  // Initially, loading should be present
+  expect(screen.getByText(/loading/i)).toBeInTheDocument();
+
+  // Wait for users to appear in the UI
+  await waitFor(() => screen.getByText('John Doe'));
+
+  // Ensure that users are displayed after the API call
+  expect(screen.getByText('John Doe')).toBeInTheDocument();
+});
+In this example:
+
+Mocking Axios: jest.mock('axios') allows you to mock API responses for isolation.
+waitFor: Ensures the test waits for async operations (like API responses) before asserting.
+Testing useCallback and useMemo
+If you use useCallback or useMemo, you don't need special treatment in tests. They are mostly optimizations and can be tested like any regular functions in the component.
+
+Mocking Functions Passed as Props
+If a method is passed to your component as a prop, you can mock that method using jest.fn():
+
+tsx
+Copy code
+const mockIncrement = jest.fn();
+
+render(<Counter increment={mockIncrement} />);
+
+// Simulate the click event
+fireEvent.click(screen.getByRole('button', { name: /increment/i }));
+
+// Assert the mock function was called
+expect(mockIncrement).toHaveBeenCalled();
+This ensures you test how the component interacts with external functions or props.
+
+Best Practices:
+Test Behavior, Not Implementation: Focus on how the component behaves, rather than the internal implementation of hooks.
+Use findBy for Async Queries: Use findBy* methods for elements that appear after async operations, such as data fetching.
+Mock External Dependencies: When testing, mock any external services (like APIs) so the tests remain fast and reliable.
+This approach will cover most functional component methods in React and their interaction with hooks like useState, useEffect, and event handlers.
+
+# RTL Query
+
+In React Testing Library (RTL), queries are used to find elements in the rendered component. RTL provides various queries based on accessibility, text content, role, labels, and more.
+
+
+Types of Queries in RTL
+getBy: Throws an error if no element or multiple elements are found.
+
+getByText()
+getByRole()
+getByLabelText()
+getByPlaceholderText()
+getByAltText()
+getByTestId()
+queryBy: Returns null if no element is found, which can be useful for assertions when elements are not expected to exist.
+
+queryByText()
+queryByRole()
+findBy: Returns a promise that resolves when the element is found (useful for async components).
+
+findByText()
+findByRole()
+All queries: These return all matching elements (or an empty array if none are found).
+
+getAllByText()
+queryAllByText()
+findAllByText()
+Common Queries
+1. getByText
+Finds an element by its text content.
+
+tsx
+Copy code
+const { getByText } = render(<Component />);
+const element = getByText(/submit/i); // Case insensitive match
+2. getByRole
+Finds an element by its role (like a button, heading, etc.).
+
+tsx
+Copy code
+const { getByRole } = render(<button>Click me</button>);
+const button = getByRole('button');
+3. getByPlaceholderText
+Finds input elements by their placeholder attribute.
+
+tsx
+Copy code
+const { getByPlaceholderText } = render(<input placeholder="Enter name" />);
+const input = getByPlaceholderText('Enter name');
+4. getByTestId
+Finds an element by a custom test id.
+
+tsx
+Copy code
+const { getByTestId } = render(<div data-testid="custom-element" />);
+const element = getByTestId('custom-element');
+Example Test
+Here’s a basic test using getByText and getByRole:
+
+tsx
+Copy code
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import MyComponent from './MyComponent';
+
+test('renders a button and handles click event', () => {
+  render(<MyComponent />);
+  
+  const button = screen.getByRole('button', { name: /submit/i });
+  expect(button).toBeInTheDocument();
+  
+  userEvent.click(button);
+  expect(screen.getByText(/loading/i)).toBeInTheDocument();
+});
+In this test:
+
+getByRole finds the button by its role and accessible name.
+getByText checks that a "loading" message appears after the button is clicked.
+Selecting Queries
+getByRole is often preferred as it mimics how users interact with a page (through roles and accessible names).
+getByText is helpful for text content matching.
+getByTestId should be a last resort when no other query works.
+These queries will help you effectively test your React components based on how users interact with them.
+
+
+RTL Query is used to findout  the ui components  and test ui component
+
+steps in testing ui
+1. render component
+2. find element and actions (optional)
+3. assertions
+
+
+how RTL find element
+by element type
+by element name
+by element id
+by testid
+by element role
+
+
+type of RTL Queries
+- FInd single element
+getby, queryBy, findBy
+
+- FInd multiple elements
+getAllBy, queryAllBy, findAllBy
+
+
+# Semantic and Non-semantic
+semantic tags describes something in the ui
+roles for semantic tags are defined by default like role button for button.
+semantic elements: Button, heading tags and table
+Non-semantic: div and span, dont have role
+
+# getByRole Query
+used to test single element
+
+
+
+# input with the value attribute:
+`Warning`: You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultValue`. Otherwise, set either `onChange` or `readOnly`.
+
+# input with the defaultValue attribute:
+no error or warning
+
+
+# getByAllRole Query:
+to test for multiple 
+we can test multiple element when the attribute of elements are same 
+
+
+
+# Override data-testid;
+
+import { render, screen, configure } from "@testing-library/react";
+configure({ testIdAttribute: 'element-id' });

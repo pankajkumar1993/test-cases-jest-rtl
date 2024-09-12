@@ -23,7 +23,7 @@ function App() {
         <p>testing react app</p>
         <OnChangeEvents />
         <OnClickEvent />
-        <UserClassComponent/>
+        <UserClassComponent />
       </header>
     </div>
   );
