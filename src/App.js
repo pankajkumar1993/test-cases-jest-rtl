@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import OnChangeEvents from './OnChangeEvents/OnChangeEvents';
 import OnClickEvent from './OnClickEvent/OnClickEvent';
+import UserClassComponent from './ClassComponent/ClassComponent';
 
 function App() {
   return (
@@ -17,11 +18,12 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn React
+          Learn React with jest
         </a>
         <p>testing react app</p>
         <OnChangeEvents />
         <OnClickEvent />
+        <UserClassComponent/>
       </header>
     </div>
   );
