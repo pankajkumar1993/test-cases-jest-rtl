@@ -91,3 +91,43 @@ Enable Emmet abbreviations in languages that are not supported by default. Add a
 
 Files: Associations
 Configure glob patterns of file associations to languages (for example "*.extension": "html"). Patterns will match on the absolute path of a file if they contain a path separator and will match on the name of the file otherwise. These have precedence over the default associations of the languages installed.
+
+
+
+import React, { useEffect, useState } from 'react';
+import { Virtuoso } from 'react-virtuoso';
+import ReactDOM from 'react-dom/client';
+
+const App = () => {
+  const [pokemon, setPokemon] = useState([]);
+
+  useEffect(() => {
+    async function fetchPokemon() {
+      const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151');
+      const data = await response.json();
+      setPokemon(data.results);
+    };
+   fetchPokemon();
+  }, []);
+
+  return (
+    <div>
+      <h1>Virtualized Pokémon List</h1>
+      <Virtuoso
+        style={{ height: '600px' }}
+        totalCount={pokemon.length}
+        itemContent={(index) => {
+          const poke = pokemon[index];
+          return (
+            <div key={poke.name} style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
+              {index + 1}. {poke.name}
+            </div>
+          );
+        }}
+      />
+    </div>
+  );
+};
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
