@@ -1,5 +1,5 @@
 import React from 'react'
-import otherMethod from '../helper';
+import otherMethod from '../../helper';
 
 const FunctionalComponent = () => {
     const [data, setData] = React.useState("");

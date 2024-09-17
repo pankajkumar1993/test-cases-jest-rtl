@@ -18,5 +18,5 @@ test("testing component", () => {
     // Method:3 we can only print 7000 lines of code in console, so we have to increate the limit by cmd DEBUG_PRINT_LIMIT=10000 npm test
 
     // Method:4 create rules
-    logRoles(container);
+    // logRoles(container);
 })

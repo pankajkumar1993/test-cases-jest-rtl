@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import FunctionalComponent from "./FunctionalComponent";
-import otherMethod from "../helper";
+import otherMethod from "../../helper";
 
 test("test functional component", () => {
     render(<FunctionalComponent />)

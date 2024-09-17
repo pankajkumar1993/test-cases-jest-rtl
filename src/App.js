@@ -1,8 +1,8 @@
 import logo from './logo.svg';
 import './App.css';
-import UserEventClick from './Events/2-UserEvent/OnClick/UserEventClick';
-import TestProps from './TestProps/SimpleTestProps/SimpleTestProps';
-import UsersLists from './MockServiceWorker/CallAPi/UsersLists';
+import UserEventClick from './components/Events/2-UserEvent/OnClick/UserEventClick';
+import TestProps from './components/TestProps/SimpleTestProps/SimpleTestProps';
+import UsersLists from './components/MockServiceWorker/CallAPi/UsersLists';
 
 function App() {
   return (
